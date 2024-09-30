@@ -151,7 +151,7 @@
 
             // Aguarda a animação antes de mostrar o resultado
             setTimeout(() => {
-                resultDiv.textContent = 'Resultado: ' + resultColor + galeMessage;
+                resultDiv.innerHTML = `Resultado: <span style="color: ${resultColor.toLowerCase()}; font-weight: bold;">${resultColor}</span>${galeMessage}`;
                 resultDiv.style.opacity = 1; // Torna o resultado visível
             }, 500); // Tempo igual ao da animação
 
@@ -194,3 +194,4 @@
 
 </body>
 </html>
+
