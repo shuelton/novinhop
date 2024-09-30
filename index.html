@@ -169,7 +169,7 @@
                 ball.className = 'result-ball';
                 ball.style.backgroundColor = resultBallColor; // Cor da bolinha
                 resultDiv.appendChild(ball); // Adiciona a bolinha ao resultado
-                resultDiv.innerHTML += ` ${galeMessage}`; // Adiciona a mensagem de gale ao resultado com espaço
+                resultDiv.innerHTML += `&nbsp;${galeMessage}`; // Adiciona um espaço e a mensagem de gale ao resultado
                 resultDiv.style.opacity = 1; // Torna o resultado visível
             }, 500); // Tempo igual ao da animação
 
@@ -212,5 +212,3 @@
 
 </body>
 </html>
-
-
