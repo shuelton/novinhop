@@ -80,6 +80,15 @@
             margin-top: 20px;
             transition: opacity 0.5s ease;
             opacity: 0; /* Inicialmente invisível */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .result-ball {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -123,6 +132,7 @@
             const resultDiv = document.getElementById('result');
             let resultColor;
             let galeMessage;
+            let resultBallColor;
 
             // Anima as cabeças de robô
             robots.forEach(robot => {
@@ -138,20 +148,28 @@
                     robot.className = 'robot-head white'; // Define a cor da cabeça do robô
                     resultColor = 'Branco'; // Guarda o resultado
                     galeMessage = Math.random() < 0.5 ? ' (até gale 9)' : ' (até gale 10)'; // Escolhe aleatoriamente entre gale 9 e 10
+                    resultBallColor = 'white';
                 } else if (isBlack) {
                     robot.className = 'robot-head black'; // Define a cor da cabeça do robô
                     resultColor = 'Preto'; // Guarda o resultado
                     galeMessage = Math.random() < 0.5 ? ' (até gale 2)' : ' (até gale 3)'; // Escolhe aleatoriamente entre gale 2 e 3
+                    resultBallColor = 'black';
                 } else {
                     robot.className = 'robot-head red'; // Define a cor da cabeça do robô
                     resultColor = 'Vermelho'; // Guarda o resultado
                     galeMessage = Math.random() < 0.5 ? ' (até gale 2)' : ' (até gale 3)'; // Escolhe aleatoriamente entre gale 2 e 3
+                    resultBallColor = 'red';
                 }
             });
 
             // Aguarda a animação antes de mostrar o resultado
             setTimeout(() => {
-                resultDiv.innerHTML = `Resultado: <span style="color: ${resultColor.toLowerCase()}; font-weight: bold;">${resultColor}</span>${galeMessage}`;
+                resultDiv.innerHTML = `Resultado: `;
+                const ball = document.createElement('div');
+                ball.className = 'result-ball';
+                ball.style.backgroundColor = resultBallColor; // Cor da bolinha
+                resultDiv.appendChild(ball); // Adiciona a bolinha ao resultado
+                resultDiv.innerHTML += ` ${galeMessage}`; // Adiciona a mensagem de gale ao resultado com espaço
                 resultDiv.style.opacity = 1; // Torna o resultado visível
             }, 500); // Tempo igual ao da animação
 
@@ -194,4 +212,5 @@
 
 </body>
 </html>
+
 
