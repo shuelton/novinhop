@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rodada de Double</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e2f;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            width: 90%;
+            max-width: 600px; /* Limite de largura para dispositivos grandes */
+            border: 2px solid #007BFF;
+            border-radius: 20px; /* Bordas arredondadas */
+            padding: 20px;
+            background-color: #2b2b3b; /* Cor de fundo da grade */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            display: grid;
+            grid-template-rows: auto auto 1fr auto; /* Layout da grade */
+            gap: 20px; /* Espaçamento entre os elementos */
+        }
+        .header {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .numbers {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .robot-head {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-size: 30px; /* Tamanho do ícone */
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.5s ease; /* Adiciona a animação de rotação */
+        }
+        .black {
+            background-color: black;
+        }
+        .red {
+            background-color: red;
+        }
+        .white {
+            background-color: white;
+        }
+        .footer {
+            margin-top: 20px;
+        }
+        .verify-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .verify-button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            font-size: 24px;
+            margin-top: 20px;
+            transition: opacity 0.5s ease;
+            opacity: 0; /* Inicialmente invisível */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">Rodada de Double</div>
+        <div class="numbers" id="robotContainer">
+            <div class="robot-head">🤖</div>
+            <div class="robot-head">🤖</div>
+            <div class="robot-head">🤖</div>
+            <div class="robot-head">🤖</div>
+        </div>
+        <div class="footer">
+            <button class="verify-button" id="verificarButton" onclick="spinAndDisplayResult()">VERIFICAR APOSTA</button>
+        </div>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        let clickCount = 0;
+        let isBlocked = false;
+
+        // Verifica se o botão deve estar bloqueado ao carregar a página
+        window.onload = function() {
+            const blockData = JSON.parse(localStorage.getItem('blockData'));
+            if (blockData && blockData.expiry > Date.now()) {
+                bloquearBotao(blockData.remaining);
+            } else {
+                localStorage.removeItem('blockData');
+            }
+        };
+
+        function spinAndDisplayResult() {
+            if (isBlocked) {
+                return; // Se o botão estiver bloqueado, não faz nada
+            }
+
+            clickCount++;
+            const robots = document.querySelectorAll('.robot-head');
+            const resultDiv = document.getElementById('result');
+            let resultColor;
+            let galeMessage;
+
+            // Anima as cabeças de robô
+            robots.forEach(robot => {
+                robot.style.transform = 'rotate(-360deg)'; // Rotação para a esquerda
+
+                // Gera um número aleatório para definir a cor
+                const randomNum = Math.random();
+                let isWhite = randomNum < 0.01; // 1% de chance para resultado branco
+                let isBlack = randomNum >= 0.01 && randomNum < 0.495; // Preto se o número estiver entre 0.01 e 0.495 (49.5%)
+                let isRed = randomNum >= 0.495; // Vermelho se o número for 0.495 ou mais (49.5%)
+
+                if (isWhite) {
+                    robot.className = 'robot-head white'; // Define a cor da cabeça do robô
+                    resultColor = 'Branco'; // Guarda o resultado
+                    galeMessage = Math.random() < 0.5 ? ' (até gale 9)' : ' (até gale 10)'; // Escolhe aleatoriamente entre gale 9 e 10
+                } else if (isBlack) {
+                    robot.className = 'robot-head black'; // Define a cor da cabeça do robô
+                    resultColor = 'Preto'; // Guarda o resultado
+                    galeMessage = Math.random() < 0.5 ? ' (até gale 2)' : ' (até gale 3)'; // Escolhe aleatoriamente entre gale 2 e 3
+                } else {
+                    robot.className = 'robot-head red'; // Define a cor da cabeça do robô
+                    resultColor = 'Vermelho'; // Guarda o resultado
+                    galeMessage = Math.random() < 0.5 ? ' (até gale 2)' : ' (até gale 3)'; // Escolhe aleatoriamente entre gale 2 e 3
+                }
+            });
+
+            // Aguarda a animação antes de mostrar o resultado
+            setTimeout(() => {
+                resultDiv.textContent = 'Resultado: ' + resultColor + galeMessage;
+                resultDiv.style.opacity = 1; // Torna o resultado visível
+            }, 500); // Tempo igual ao da animação
+
+            // Bloquear botão se o contador de cliques atingir 5
+            if (clickCount >= 5) {
+                bloquearBotao();
+            }
+        }
+
+        function bloquearBotao(remainingTime = 300) { // 5 minutos = 300 segundos
+            isBlocked = true;
+            const button = document.getElementById('verificarButton');
+            button.innerText = "Bloqueado por 5 minutos";
+            button.disabled = true;
+
+            const expiryTime = Date.now() + remainingTime * 1000;
+            localStorage.setItem('blockData', JSON.stringify({ expiry: expiryTime, remaining: remainingTime }));
+
+            const countdownInterval = setInterval(() => {
+                remainingTime--;
+
+                if (remainingTime <= 0) {
+                    clearInterval(countdownInterval);
+                    desbloquearBotao();
+                } else {
+                    button.innerText = `Reativar em ${remainingTime} segundos`;
+                }
+            }, 1000);
+        }
+
+        function desbloquearBotao() {
+            isBlocked = false;
+            const button = document.getElementById('verificarButton');
+            button.innerText = "VERIFICAR APOSTA";
+            button.disabled = false;
+            clickCount = 0; // Reseta o contador de cliques
+            localStorage.removeItem('blockData'); // Limpa o bloqueio do localStorage
+        }
+    </script>
+
+</body>
+</html>
